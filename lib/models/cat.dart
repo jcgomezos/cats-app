@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 
@@ -6,47 +5,47 @@ part 'cat.g.dart';
 
 @JsonSerializable()
 class Cat {
-  Cat({
-    this.weight,
-    this.id,
-    this.name,
-    this.cfaUrl,
-    this.vetstreetUrl,
-    this.vcahospitalsUrl,
-    this.temperament,
-    this.origin,
-    this.countryCodes,
-    this.countryCode,
-    this.description,
-    this.lifeSpan,
-    this.indoor,
-    this.lap,
-    this.altNames,
-    this.adaptability,
-    this.affectionLevel,
-    this.childFriendly,
-    this.dogFriendly,
-    this.energyLevel,
-    this.grooming,
-    this.healthIssues,
-    this.intelligence,
-    this.sheddingLevel,
-    this.socialNeeds,
-    this.strangerFriendly,
-    this.vocalisation,
-    this.experimental,
-    this.hairless,
-    this.natural,
-    this.rare,
-    this.rex,
-    this.suppressedTail,
-    this.shortLegs,
-    this.wikipediaUrl,
-    this.hypoallergenic,
-    this.referenceImageId,
-    this.catFriendly,
-    this.bidability,
-  });
+  Cat({this.weight,
+        this.id,
+        this.name,
+        this.cfaUrl,
+        this.vetstreetUrl,
+        this.vcahospitalsUrl,
+        this.temperament,
+        this.origin,
+        this.countryCodes,
+        this.countryCode,
+        this.description,
+        this.lifeSpan,
+        this.indoor,
+        this.lap,
+        this.altNames,
+        this.adaptability,
+        this.affectionLevel,
+        this.childFriendly,
+        this.dogFriendly,
+        this.energyLevel,
+        this.grooming,
+        this.healthIssues,
+        this.intelligence,
+        this.sheddingLevel,
+        this.socialNeeds,
+        this.strangerFriendly,
+        this.vocalisation,
+        this.experimental,
+        this.hairless,
+        this.natural,
+        this.rare,
+        this.rex,
+        this.suppressedTail,
+        this.shortLegs,
+        this.wikipediaUrl,
+        this.hypoallergenic,
+        this.referenceImageId,
+        this.image,
+        this.catFriendly,
+        this.bidability,
+    });
 
   factory Cat.fromJson(Map<String, dynamic> json) => Cat(
         weight: json["weight"] == null ? null : Weight.fromJson(json["weight"]),
@@ -86,55 +85,77 @@ class Cat {
         wikipediaUrl: json["wikipedia_url"],
         hypoallergenic: json["hypoallergenic"],
         referenceImageId: json["reference_image_id"],
+        image: json["image"] == null ? null : Images.fromJson(json["image"]),
         catFriendly: json["cat_friendly"],
         bidability: json["bidability"],
       );
 
-  Weight? weight;
-  String? id;
-  String? name;
-  String? cfaUrl;
-  String? vetstreetUrl;
-  String? vcahospitalsUrl;
-  String? temperament;
-  String? origin;
-  String? countryCodes;
-  String? countryCode;
-  String? description;
-  String? lifeSpan;
-  int? indoor;
-  int? lap;
-  String? altNames;
-  int? adaptability;
-  int? affectionLevel;
-  int? childFriendly;
-  int? dogFriendly;
-  int? energyLevel;
-  int? grooming;
-  int? healthIssues;
-  int? intelligence;
-  int? sheddingLevel;
-  int? socialNeeds;
-  int? strangerFriendly;
-  int? vocalisation;
-  int? experimental;
-  int? hairless;
-  int? natural;
-  int? rare;
-  int? rex;
-  int? suppressedTail;
-  int? shortLegs;
-  String? wikipediaUrl;
-  int? hypoallergenic;
-  String? referenceImageId;
-  int? catFriendly;
-  int? bidability;
+    Weight? weight;
+    String? id;
+    String? name;
+    String? cfaUrl;
+    String? vetstreetUrl;
+    String? vcahospitalsUrl;
+    String? temperament;
+    String? origin;
+    String? countryCodes;
+    String? countryCode;
+    String? description;
+    String? lifeSpan;
+    int? indoor;
+    int? lap;
+    String? altNames;
+    int? adaptability;
+    int? affectionLevel;
+    int? childFriendly;
+    int? dogFriendly;
+    int? energyLevel;
+    int? grooming;
+    int? healthIssues;
+    int? intelligence;
+    int? sheddingLevel;
+    int? socialNeeds;
+    int? strangerFriendly;
+    int? vocalisation;
+    int? experimental;
+    int? hairless;
+    int? natural;
+    int? rare;
+    int? rex;
+    int? suppressedTail;
+    int? shortLegs;
+    String? wikipediaUrl;
+    int? hypoallergenic;
+    String? referenceImageId;
+    Images? image;
+    int? catFriendly;
+    int? bidability;
 
   Map<String, dynamic> toJson() => _$CatToJson(this);
 
   @override
   String toString() => toJson().toString();
 }
+
+
+@JsonSerializable()
+class Images {
+    String? id;
+    int? width;
+    int? height;
+    String? url;
+
+    Images();
+
+
+    factory Images.fromJson(Map<String, dynamic> json) => _$ImagesFromJson(json);
+
+    Map<String, dynamic> toJson() => _$ImagesToJson(this);
+
+    @override
+    String toString() => toJson().toString();
+}
+
 
 @JsonSerializable()
 class Weight {

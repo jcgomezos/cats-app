@@ -1,6 +1,7 @@
 
 import 'package:dio/dio.dart';
-import 'package:kitties_app/models/cat_response.dart';
+import 'package:kitties_app/models/cat.dart';
+
 
 class CatService {
   final Dio _dio = Dio(BaseOptions(
@@ -10,12 +11,12 @@ class CatService {
     }));
   
   
-  Future<List<CatResponse>> getCats() async {
+  Future<List<Cat>> getCats() async {
     try {
-      final response = await _dio.get("images/search?limit=10&breed_ids=beng");
+      final response = await _dio.get("breeds");
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        return data.map((json) => CatResponse.fromJson(json)).toList();
+        return data.map((json) => Cat.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load cats');
       }
