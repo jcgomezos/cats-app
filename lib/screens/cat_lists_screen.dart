@@ -15,12 +15,20 @@ class _CatListScreenState extends State<CatListScreen> {
   final CatService _catService = CatService();
   bool _isLoading = true;
   String? _error;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     // Using Future.microtask to avoid calling Provider.of during build
     Future.microtask(() => _loadCats());
+  }
+
+   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCats() async {
@@ -49,6 +57,55 @@ class _CatListScreenState extends State<CatListScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Widget _buildSearchField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Filtra los gatos por su raza...',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.blue),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.blue, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value.toLowerCase();
+          });
+        },
+      ),
+    );
+  }
+
+  List<dynamic> _getFilteredCats(List<dynamic> cats) {
+    if (_searchQuery.isEmpty) {
+      return cats;
+    }
+    return cats.where((cat) {
+      final name = (cat.name ?? '').toLowerCase();
+      return name.contains(_searchQuery);
+    }).toList();
   }
 
   Widget _buildErrorWidget(String error) {
@@ -94,7 +151,8 @@ class _CatListScreenState extends State<CatListScreen> {
   }
 
   Widget _buildCatList(BreedProvider breedProvider) {
-    if (breedProvider.catResponse.isEmpty) {
+    final filteredCats = _getFilteredCats(breedProvider.catResponse);
+    if (filteredCats.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -105,42 +163,42 @@ class _CatListScreenState extends State<CatListScreen> {
               color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            const Text('No se encontraron gatos'),
+            Text(_searchQuery.isEmpty 
+                ? 'No se encontraron gatos' 
+                : 'No hay gatos de tipo "$_searchQuery"'),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadCats,
-              child: const Text('Refresca'),
-            ),
+            if (_searchQuery.isEmpty)
+              ElevatedButton(
+                onPressed: _loadCats,
+                child: const Text('Refresca'),
+              ),
           ],
         ),
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadCats,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: breedProvider.catResponse.length,
-        itemBuilder: (context, index) {
-          final cat = breedProvider.catResponse[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CatDetailScreen(cat: cat),
-                  ),
-                );
-              },
-              leading: _buildCatAvatar(cat),
-              title: Text(cat.name ?? 'No se conoce su nombre'),
-              subtitle: Text(cat.countryCode ?? 'No se conoce su origen'),
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: filteredCats.length,
+      itemBuilder: (context, index) {
+        final cat = filteredCats[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: ListTile(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CatDetailScreen(cat: cat),
+                ),
+              );
+            },
+            leading: _buildCatAvatar(cat),
+            title: Text(cat.name ?? 'No se conoce su nombre'),
+            subtitle: Text(cat.countryCode ?? 'No se conoce su origen'),
+          ),
+        );
+      },
     );
   }
 
@@ -174,24 +232,26 @@ class _CatListScreenState extends State<CatListScreen> {
             ),
         ],
       ),
-      body: Consumer<BreedProvider>(
-        builder: (context, breedProvider, child) {
-          if (_isLoading) {
-            return _buildLoadingWidget();
-          }
-
-          if (_error != null) {
-            return _buildErrorWidget(_error!);
-          }
-
-          return _buildCatList(breedProvider);
-        },
+      body: Column(
+        children: [
+          _buildSearchField(),
+          Expanded(
+            child: Consumer<BreedProvider>(
+              builder: (context, breedProvider, child) {
+                if (_isLoading) {
+                  return _buildLoadingWidget();
+                }
+                
+                if (_error != null) {
+                  return _buildErrorWidget(_error!);
+                }
+                
+                return _buildCatList(breedProvider);
+              },
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
